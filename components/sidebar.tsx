@@ -48,7 +48,7 @@ export function Sidebar() {
     <div className="flex flex-col w-64 bg-white border-r">
       <div className="flex items-center justify-center h-16 border-b px-4">
         <img
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/shizen-DV5y0tAMI2QboMRqqMopIfKJC76cVa.jpeg"
+          src="/shizen.jpeg"
           alt="SHIZEN"
           className="h-8 w-auto"
         />

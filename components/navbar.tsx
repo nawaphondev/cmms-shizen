@@ -71,7 +71,7 @@ export function Navbar() {
         <div className="flex h-16 items-center px-4 justify-between">
           <div className="flex items-center gap-2 font-semibold">
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/shizen-DV5y0tAMI2QboMRqqMopIfKJC76cVa.jpeg"
+              src="/shizen.jpeg"
               alt="Shizen Logo"
               width={250}
               height={32}
