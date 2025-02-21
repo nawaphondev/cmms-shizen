@@ -1,0 +1,230 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  technician
+  supervisor
+  user
+}
+
+enum RepairRequestStatus {
+  PENDING         // รอดำเนินการ
+  IN_PROGRESS     // กำลังดำเนินการ
+  COMPLETED       // เสร็จสิ้น
+}
+
+enum MachineStatus {
+  AVAILABLE       // พร้อมใช้งาน
+  UNAVAILABLE     // ไม่พร้อมใช้งาน
+  UNDER_REPAIR    // กำลังซ่อม
+}
+
+enum SparePartStatus {
+  IN_OPERATION    // กำลังใช้งาน
+  NOT_OPERATIONAL // ไม่พร้อมใช้งาน
+}
+
+enum GroupPermissionStatus {
+  ACTIVE          // ใช้งานอยู่
+  INACTIVE        // ไม่ใช้งาน
+}
+
+// ======================
+// User & Authentication
+// ======================
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String   // เก็บในรูปแบบ hashed password
+  name      String
+  role      UserRole
+  email     String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ======================
+// Repair Requests & Related Models
+// ======================
+model RepairRequest {
+  id              Int            @id @default(autoincrement())
+  requestNumber   String         @unique
+  repairType      String
+  department      String
+  team            String
+  machineCode     String
+  machineName     String
+  initialSymptoms String
+  machineStatus   String
+  reporter        String
+  responsible     String
+  reportDate      DateTime
+  reason          String
+  solution        String
+  status          RepairRequestStatus
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  timelines       RepairTimeline[]
+  attachments     Attachment[]
+  schedule        RepairSchedule?
+}
+
+model RepairTimeline {
+  id              Int           @id @default(autoincrement())
+  repairRequestId Int
+  date            DateTime
+  event           String
+  updatedBy       String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  repairRequest   RepairRequest @relation(fields: [repairRequestId], references: [id])
+}
+
+model Attachment {
+  id              Int           @id @default(autoincrement())
+  repairRequestId Int
+  fileName        String
+  fileUrl         String
+  fileType        String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  repairRequest   RepairRequest @relation(fields: [repairRequestId], references: [id])
+}
+
+model RepairSchedule {
+  id              Int           @id @default(autoincrement())
+  repairRequestId Int           @unique
+  startDate       DateTime
+  duration        String
+  notification    String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  repairRequest   RepairRequest @relation(fields: [repairRequestId], references: [id])
+}
+
+// ======================
+// Work Types
+// ======================
+model WorkType {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  name      String
+  details   String
+  status    String   // "active" หรือ "inactive" สามารถใช้ enum หากต้องการ
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ======================
+// Staff Management
+// ======================
+model Staff {
+  id         Int      @id @default(autoincrement())
+  code       String   @unique
+  name       String
+  position   String
+  department String
+  status     String   // "active" หรือ "inactive"
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ======================
+// Machines Management
+// ======================
+model Machine {
+  id         Int           @id @default(autoincrement())
+  code       String        @unique
+  status     MachineStatus
+  building   String
+  zone       String
+  supervisor String
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+}
+
+// ======================
+// Spare Parts
+// ======================
+model SparePart {
+  id          Int             @id @default(autoincrement())
+  code        String          @unique
+  type        String
+  name        String
+  description String
+  status      SparePartStatus
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+// ======================
+// Inventory Management
+// ======================
+model InventoryItem {
+  id                Int      @id @default(autoincrement())
+  name              String
+  type              String
+  details           String
+  addedQuantity     Int
+  withdrawnQuantity Int
+  total             Int      // คำนวณ: addedQuantity - withdrawnQuantity
+  addedBy           String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// ======================
+// Group Permissions
+// ======================
+model GroupPermission {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  department  String
+  name        String
+  description String
+  status      GroupPermissionStatus
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ======================
+// Devices (สำหรับ Security Settings)
+// ======================
+model Device {
+  id        Int      @id @default(autoincrement())
+  name      String
+  location  String
+  progress  Int
+  status    String   // "active" หรือ "inactive"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ======================
+// Language (สำหรับรองรับหลายภาษา)
+// ======================
+model Language {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  nativeName  String
+  englishName String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
