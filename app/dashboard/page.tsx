@@ -140,7 +140,7 @@ export default function DashboardPage() {
   return (
     <div className="p-6">
       <div className="flex items-center gap-4 mb-6">
-        {(user?.role === "admin" || user?.role === "technician") && (
+
           <Dialog>
             <DialogTrigger asChild>
               <Button>+ Repair Request</Button>
@@ -152,7 +152,7 @@ export default function DashboardPage() {
               <RepairRequestForm />
             </DialogContent>
           </Dialog>
-        )}
+
 
         <Popover>
           <PopoverTrigger asChild>
