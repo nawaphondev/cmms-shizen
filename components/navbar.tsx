@@ -27,6 +27,11 @@ import {
 import { useAuth } from "@/lib/AuthContext"
 import React from "react"
 
+// Create a constant for the roles
+const USER_ROLES = {
+  ADMIN: "admin",
+}
+
 const pageIcons: { [key: string]: any } = {
   "/dashboard": { icon: Home, label: "Dashboard" },
   "/repair-requests": { icon: PenToolIcon, label: "Repair Requests" },
@@ -105,7 +110,7 @@ export function Navbar() {
         {!user && (
           <div className="flex items-center gap-2 font-semibold">
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/shizen-DV5y0tAMI2QboMRqqMopIfKJC76cVa.jpeg"
+              src="/shizen.jpeg"
               alt="Shizen Logo"
               width={250}
               height={32}
@@ -115,17 +120,10 @@ export function Navbar() {
         )}
         {user && (
           <div className="flex items-center gap-2 font-semibold">
-            {pageIcons[pathname] ? (
-              <>
-                {React.createElement(pageIcons[pathname].icon, { className: "h-6 w-6" })}
-                <span>{pageIcons[pathname].label}</span>
-              </>
-            ) : (
-              <>
-                <Home className="h-6 w-6" />
-                <span>Dashboard</span>
-              </>
-            )}
+            <>
+              {React.createElement(currentPage.icon, { className: "h-6 w-6" })}
+              <span>{currentPage.label}</span>
+            </>
           </div>
         )}
         <div className="flex items-center gap-4">
@@ -149,7 +147,7 @@ export function Navbar() {
             <>
               <div className="flex items-center gap-2">
                 <Avatar>
-                  <AvatarImage src={user.avatar || "/placeholder.svg?height=32&width=32"} alt={user.name} />
+                  <AvatarImage src={user.avatar ? user.avatar : "/Admin.png"} alt={user.name} />
                   <AvatarFallback>
                     {user.name
                       .split(" ")
@@ -159,7 +157,7 @@ export function Navbar() {
                 </Avatar>
                 <span className="text-sm font-medium">{user.name}</span>
               </div>
-              {user.role === "admin" && (
+              {user.role === USER_ROLES.ADMIN && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon">
@@ -211,4 +209,3 @@ export function Navbar() {
     </div>
   )
 }
-
